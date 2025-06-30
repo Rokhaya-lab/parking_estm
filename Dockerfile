@@ -19,9 +19,6 @@ COPY . .
 # Installe les dépendances PHP
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Installe les dépendances JS et build les assets
-RUN npm ci && npm run build
-
 # Donne les bons droits (important pour Laravel)
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
