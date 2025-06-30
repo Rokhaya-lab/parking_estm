@@ -30,7 +30,10 @@ EXPOSE 8080
 # Commande de démarrage
 CMD touch /var/www/html/database/database.sqlite \
     && chmod -R 775 storage bootstrap/cache \
-    && php artisan optimize:clear \
     && php artisan migrate --force \
     && php artisan db:seed --force \
+    && php artisan optimize:clear \
+    && php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache \
     && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
