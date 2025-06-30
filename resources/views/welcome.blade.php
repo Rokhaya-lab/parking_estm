@@ -9,8 +9,9 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
     
-    <!-- Tailwind CSS -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Tailwind CSS (production fix) -->
+    <link rel="stylesheet" href="{{ asset('build/assets/app-BKqD6kw-.css') }}">
+    <script type="module" src="{{ asset('build/assets/app-DNxiirP_.js') }}"></script>
     
     <!-- Additional Styles -->
     <style>
