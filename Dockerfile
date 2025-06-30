@@ -27,6 +27,7 @@ EXPOSE 8080
 # Commande de démarrage
 CMD touch /var/www/html/database/database.sqlite \
     && chmod -R 775 storage bootstrap/cache \
+    && chmod -R 755 public/build \
     && php artisan migrate --force \
     && php artisan db:seed --force \
     && php artisan optimize:clear \
