@@ -28,7 +28,7 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 EXPOSE 8080
 
 # Commande de démarrage
-CMD touch database/database.sqlite \
+CMD touch /var/www/html/database/database.sqlite \
     && chmod -R 775 storage bootstrap/cache \
     && php artisan optimize:clear \
     && php artisan migrate --force \
