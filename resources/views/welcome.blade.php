@@ -9,8 +9,9 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
     
-    <!-- Scripts and Styles -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Styles et Scripts -->
+    <link href="{{ secure_asset('build/assets/app-BKqD6kw-.css') }}" rel="stylesheet">
+    <script src="{{ secure_asset('build/assets/app-DNxiirP_.js') }}" defer></script>
     
     <!-- Additional Styles -->
     <style>
