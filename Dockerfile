@@ -16,24 +16,26 @@ WORKDIR /var/www/html
 # Copie le code source
 COPY . .
 
-# Installe les dépendances PHP et NPM
+# Installe les dépendances PHP et NPM, et build les assets
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader \
     && npm install \
-    && npm run build
+    && npm run build \
+    && rm -rf node_modules
 
-# Donne les bons droits (important pour Laravel)
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+# Configuration des droits d'accès
+RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 storage bootstrap/cache \
-    && chmod -R 755 public
+    && chmod -R 755 public \
+    && chmod -R 755 public/build \
+    && mkdir -p storage/framework/{sessions,views,cache}
 
 EXPOSE 8080
 
 # Commande de démarrage
-CMD touch database/database.sqlite \
-    && php artisan migrate --force \
-    && php artisan db:seed --force \
-    && php artisan optimize:clear \
-    && php artisan config:cache \
+CMD php artisan config:cache \
     && php artisan route:cache \
     && php artisan view:cache \
+    && touch database/database.sqlite \
+    && php artisan migrate --force \
+    && php artisan db:seed --force \
     && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
