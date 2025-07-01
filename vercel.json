@@ -1,14 +1,8 @@
 {
-    "buildCommand": "php artisan config:cache",
-    "outputDirectory": "public",
+    "version": 2,
     "functions": {
         "api/*.php": {
             "runtime": "vercel-php@0.5.2"
-        }
-    },
-    "build": {
-        "env": {
-            "PHP_VERSION": "8.2"
         }
     },
     "routes": [
