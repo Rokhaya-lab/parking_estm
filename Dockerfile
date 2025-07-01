@@ -1,8 +1,8 @@
 # Utiliser une image PHP plus stable
 FROM php:8.2-apache
 
-# Activer le module rewrite d'Apache
-RUN a2enmod rewrite
+# Activer les modules Apache nécessaires
+RUN a2enmod rewrite headers
 
 # Installation des dépendances système
 RUN apt-get update && apt-get install -y \
@@ -36,20 +36,26 @@ RUN composer install --no-interaction --no-dev --optimize-autoloader \
 
 # Configuration des droits (après création des dossiers)
 RUN chown -R www-data:www-data . \
-    && find . -type f -exec chmod 644 {} \; \
-    && find . -type d -exec chmod 755 {} \; \
-    && chmod -R 777 storage bootstrap/cache
+    && chmod -R 755 . \
+    && chmod -R 777 storage bootstrap/cache \
+    && chmod -R 775 public/build \
+    && chown -R www-data:www-data public/build
 
 # Configuration d'Apache
 COPY docker/000-default.conf /etc/apache2/sites-available/000-default.conf
 
 # Variable d'environnement pour le port
 ENV PORT=8080
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+
+# Configuration du DocumentRoot d'Apache
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
+    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 # Commande de démarrage
-CMD sed -i "s/Listen 80/Listen ${PORT:-80}/g" /etc/apache2/ports.conf ; \
-    sed -i "s/:80/:${PORT:-80}/g" /etc/apache2/sites-available/*.conf ; \
+CMD mkdir -p storage/framework/{sessions,views,cache} ; \
     touch database/database.sqlite ; \
+    chown -R www-data:www-data storage bootstrap/cache database ; \
     php artisan optimize:clear ; \
     php artisan config:cache ; \
     php artisan route:cache ; \
