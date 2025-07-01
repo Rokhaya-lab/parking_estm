@@ -1,13 +1,21 @@
 services:
   - type: web
     name: parking-estm
-    env: php
-    buildCommand: |
-      composer install --no-interaction --prefer-dist --optimize-autoloader
-      npm install
-      npm run build
-    startCommand: php artisan serve --host=0.0.0.0 --port=10000
+    env: docker
+    dockerfilePath: ./Dockerfile
     envVars:
+      - key: APP_NAME
+        value: "Parking ESTM"
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        fromService:
+          name: parking-estm
+          type: web
+          property: host
       - key: APP_KEY
-        value: "votre_clé_app"
-      # Ajoute ici les autres variables d'environnement si besoin (APP_ENV, DB_CONNECTION, etc.)
+        generateValue: true
+      - key: DB_CONNECTION
+        value: sqlite
