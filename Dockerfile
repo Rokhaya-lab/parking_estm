@@ -23,15 +23,22 @@ WORKDIR /var/www/html
 # Copie des fichiers du projet
 COPY . .
 
+# Création des dossiers nécessaires
+RUN mkdir -p storage/framework/{sessions,views,cache} \
+    && mkdir -p bootstrap/cache \
+    && mkdir -p public/build
+
 # Installation des dépendances et build
 RUN composer install --no-interaction --no-dev --optimize-autoloader \
     && npm ci \
     && npm run build \
     && rm -rf node_modules
 
-# Configuration des droits
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 storage bootstrap/cache public
+# Configuration des droits (après création des dossiers)
+RUN chown -R www-data:www-data . \
+    && find . -type f -exec chmod 644 {} \; \
+    && find . -type d -exec chmod 755 {} \; \
+    && chmod -R 777 storage bootstrap/cache
 
 # Configuration d'Apache
 COPY docker/000-default.conf /etc/apache2/sites-available/000-default.conf
@@ -40,14 +47,13 @@ COPY docker/000-default.conf /etc/apache2/sites-available/000-default.conf
 ENV PORT=8080
 
 # Commande de démarrage
-CMD sed -i "s/Listen 80/Listen ${PORT:-80}/g" /etc/apache2/ports.conf && \
-    sed -i "s/:80/:${PORT:-80}/g" /etc/apache2/sites-available/*.conf && \
-    mkdir -p storage/framework/{sessions,views,cache} && \
-    touch database/database.sqlite && \
-    php artisan optimize:clear && \
-    php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache && \
-    php artisan migrate --force && \
-    php artisan db:seed --force && \
+CMD sed -i "s/Listen 80/Listen ${PORT:-80}/g" /etc/apache2/ports.conf ; \
+    sed -i "s/:80/:${PORT:-80}/g" /etc/apache2/sites-available/*.conf ; \
+    touch database/database.sqlite ; \
+    php artisan optimize:clear ; \
+    php artisan config:cache ; \
+    php artisan route:cache ; \
+    php artisan view:cache ; \
+    php artisan migrate --force ; \
+    php artisan db:seed --force ; \
     apache2-foreground
